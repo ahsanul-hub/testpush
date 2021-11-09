@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Halaman home</title>
+  <style>
+    input[type='submit'], button, [aria-label]{
+      cursor: pointer;
+    }
+    #spoiler{
+      display: none;
+    }
+  </style>
+  <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#"><strong>Bootstrap 3</strong></a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="index.html"><span class="glyphicon glyphicon-home"></span><strong> Home</strong> <span class="sr-only">(current)</span></a></li>
+        <li><a href="index.html"><span class="glyphicon glyphicon-globe"></span> <strong>Kontak</strong></a></li>
+        <li><a href="index.html"><span class="glyphicon glyphicon-info-sign"></span><strong> About</strong></a></li>
+      </ul>
+      <form class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search">
+        </div>
+        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search"></span> Cari</button>
+      </form>
+      <ul class="nav navbar-nav navbar-right">
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<br/>
+<br/>
+<br/>
+<br/>
+<div class="container col-md-4 col-md-offset-4">
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">Tabel data negara berkembang</h3>
+  </div>
+  <div class="panel-body">
+
+
+<form action="javascript:void(0);" method="POST" onsubmit="app.Add()"> 
+  <label>Masukan nama negara : </label>
+  <input type="text" id="add-name" placeholder="Masukan nama negara" class="form-control"><br/>
+  <button type="submit" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-plus"></span> Add</button>
+</form>
+<br/>
+<br/>
+
+
+<div id="spoiler" role="aria-hidden">
+  <form action="javascript:void(0);" method="POST" id="saveEdit">
+    <label>Edit nama negara : </label>
+    <input type="text" id="edit-name" class="form-control"><br/>
+    <button type="submit" class="btn btn-success pull-right"><span class="glyphicon glyphicon-pencil"></span> Edit</button> <a class="btn btn-default" onclick="CloseInput()" aria-label="Close"><span class="glyphicon glyphicon-remove"></span> Batal</a>
+  </form>
+</div>
+<br/>
+<br/>
+
+<p id="counter"></p>
+
+<table class="table table-striped">
+  <tr>
+    <th>Nama Negara</th>
+    <th colspan="3">Tindakan</th>
+  </tr>
+    <tbody id="countries">
+    </tbody>
+</table>
+
+  </div>
+</div>
+</div>
+
+
+
+<script>
+var app = new function() {
+
+  this.el = document.getElementById('countries');
+
+  this.countries = ['Indonesia', 'Timor Leste', 'Brunei Darussalam'];
+
+  this.Count = function(data) {
+    var el   = document.getElementById('counter');
+    var name = 'country';
+
+    if (data) {
+      if (data > 1) {
+        name = 'Negara';
+      }
+      el.innerHTML = 'Total : ' + data + ' ' + name ;
+    } else {
+      el.innerHTML = 'No ' + name;
+    }
+  };
+  
+  this.FetchAll = function() {
+    var data = '';
+
+    if (this.countries.length > 0) {
+      for (i = 0; i < this.countries.length; i++) {
+        data += '<tr>';
+        data += '<td>' + this.countries[i] + '</td>';
+        data += '<td><button class="btn btn-success" onclick="app.Edit(' + i + ')"><span class="glyphicon glyphicon-pencil"></span> Edit</button></td>';
+        data += '<td><button class="btn btn-danger" onclick="app.Delete(' + i + ')"><span class="glyphicon glyphicon-remove"></span> Hapus</button></td>';
+        data += '<td><button class="btn btn-warning"><span class="glyphicon glyphicon-zoom-in"></span> Detail</button></td>';
+        data += '</tr>';
+      }
+    }
+
+    this.Count(this.countries.length);
+    return this.el.innerHTML = data;
+  };
+
+  this.Add = function () {
+    el = document.getElementById('add-name');
+    // Mengambil value
+    var country = el.value;
+
+    if (country) {
+      // Menambah value baru
+      this.countries.push(country.trim());
+      // Reset input value
+      el.value = '';
+      // Menampilkan data baru
+      this.FetchAll();
+    }
+  };
+
+  this.Edit = function (item) {
+    var el = document.getElementById('edit-name');
+    // Menampilkan value pada field
+    el.value = this.countries[item];
+    // Menampilkan field
+    document.getElementById('spoiler').style.display = 'block';
+    self = this;
+
+    document.getElementById('saveEdit').onsubmit = function() {
+      // Mengambil value
+      var country = el.value;
+
+      if (country) {
+        // Edit value
+        self.countries.splice(item, 1, country.trim());
+        // Menampilkan data baru
+        self.FetchAll();
+        // Menghilangkan fields
+        CloseInput();
+      }
+    }
+  };
+
+  this.Delete = function (item) {
+    // Menghapus dari current baris
+    this.countries.splice(item, 1);
+    // Menampilkan data baru
+    this.FetchAll();
+  };
+  
+}
+
+app.FetchAll();
+
+function CloseInput() {
+  document.getElementById('spoiler').style.display = 'none';
+}
+</script>
+<script type="text/javascript" src="bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
